@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour
@@ -19,6 +21,11 @@ public class PlayerInteraction : MonoBehaviour
     private Transform closestNPC;
     
     public List<Transform> npcsInRange;
+
+    public bool isInteracting = false;
+    
+    public CinemachineTargetGroup targetGroup;
+    
     private void Start()
     {
         textUI.SetActive(false);
@@ -27,6 +34,38 @@ public class PlayerInteraction : MonoBehaviour
 
     void Update()
     {
+        if (isInteracting)
+        {
+            InteractionUpdate();
+        }
+        else
+        {
+            BrowsingUpdate();
+        }
+    }
+
+
+
+    void InteractionUpdate()
+    {
+        PlayerController.Instance.canMove = false;
+
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            isInteracting = false;
+
+            targetGroup.m_Targets = Array.Empty<CinemachineTargetGroup.Target>();
+            
+            PlayerController.Instance.canMove = true;
+            PlayerController.Instance.fpsCamera.enabled = true;
+            PlayerController.Instance.thirdPersonCamera.enabled = false;
+        }
+    }
+
+    void BrowsingUpdate()
+    {
+        PlayerController.Instance.canMove = true;
+        
         DetectNearbyNPCs();
         HandleInteractionInput();
     }
@@ -64,13 +103,14 @@ public class PlayerInteraction : MonoBehaviour
             textUI.SetActive(true);
             if(Input.GetKeyDown(interactKey))
             {
+                isInteracting = true;
+                
+                CameraSetUp();
+                
                 for (int i = 0; i < npcColliders.Length; i++)
                 {
                     Debug.Log(npcColliders[i].name);
                 }
-                
-                PlayerController.Instance.SwitchCamera();
-                
             }
         }
         else
@@ -79,6 +119,21 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+
+    void CameraSetUp()
+    {
+
+        foreach (Transform t in npcsInRange)
+        {
+            targetGroup.AddMember(t,1,1);
+            
+        }
+
+        targetGroup.AddMember(PlayerController.Instance.transform,1,1);
+        
+        PlayerController.Instance.fpsCamera.enabled = false;
+        PlayerController.Instance.thirdPersonCamera.enabled = true;
+    }
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

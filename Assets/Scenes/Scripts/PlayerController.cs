@@ -30,8 +30,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         
-        thirdPersonCamera.gameObject.SetActive(false);
-        fpsCamera.gameObject.SetActive(true);
+        thirdPersonCamera.enabled = false;
+        fpsCamera.enabled = true;
         
         Instance = this;
         

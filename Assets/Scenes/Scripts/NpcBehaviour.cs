@@ -48,7 +48,6 @@ public class NpcBehaviour : MonoBehaviour
     {
         if (waypoints.Count <= 0) return Vector3.zero;
         int point = Random.Range(0, waypoints.Count);
-        Debug.Log(point);
         return waypoints[point].position;
     }
 }
