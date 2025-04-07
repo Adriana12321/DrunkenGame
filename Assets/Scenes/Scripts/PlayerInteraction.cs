@@ -59,12 +59,23 @@ public class PlayerInteraction : MonoBehaviour
 
     void HandleInteractionInput()
     {
-        if (npcColliders != null && Input.GetKeyDown(interactKey))
+        if (npcsInRange.Count>0)
         {
-            for (int i = 0; i < npcColliders.Length; i++)
+            textUI.SetActive(true);
+            if(Input.GetKeyDown(interactKey))
             {
-                Debug.Log(npcColliders[i].name);
+                for (int i = 0; i < npcColliders.Length; i++)
+                {
+                    Debug.Log(npcColliders[i].name);
+                }
+                
+                PlayerController.Instance.SwitchCamera();
+                
             }
+        }
+        else
+        {
+            textUI.SetActive(false);
         }
     }
 
