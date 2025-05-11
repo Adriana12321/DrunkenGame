@@ -1,67 +1,81 @@
-using System.Collections;
 using System.Collections.Generic;
-using NPC;
 using NPC.States;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class NpcBehaviour : MonoBehaviour
+namespace NPC
 {
-    
-    public List<Transform> waypoints;
-    NavMeshAgent agent;
-    private bool isIddling;
-    Vector3 targetPosition;
-
-    private float iddleTime;
-    
-    public PatrolState patrolState = new PatrolState();
-    public IdleState idleState = new IdleState();
-    public InteractState interactState = new InteractState();
-
-    private ICharacterState _currentState;
-    
-    [SerializeField] private float idleRange;
-    void Start()
+    public enum CharacterStateID
     {
-        agent = GetComponent<NavMeshAgent>();
-        targetPosition = GetRandomWayPoint();
-        
-        _currentState = patrolState;
-        
-        _currentState.OnEnter(this);
+        Patrol,
+        Idle,
+        Interact
     }
 
-    // Update is called once per frame
-    void Update()
+    public class NpcBehaviour : MonoBehaviour
     {
-        _currentState.OnUpdate();
-    }
-    
-    public Vector3 GetRandomWayPoint()
-    {
-        if (waypoints.Count <= 0) return Vector3.zero;
-        int point = Random.Range(0, waypoints.Count);
-        return waypoints[point].position;
-    }
+        [Header("Waypoints & Idle Settings")]
+        public List<Waypoint> waypoints;
+        public Waypoint currentWaypoint;
 
-    public void SwitchState(ICharacterState nextState)
-    {
-        _currentState.OnExit();
-        _currentState = nextState;
-        _currentState.OnEnter(this);
-    }
+        [Header("State Machine")]
+        private ICharacterState _currentState;
+        private Dictionary<CharacterStateID, ICharacterState> stateMap;
 
-    public ICharacterState GetRandomSate()
-    {
-        if (Random.Range(0, 2) == 1)
+        [SerializeField]
+        public CharacterStateID currentState;
+
+        private NavMeshAgent agent;
+
+        void Start()
         {
-            Debug.Log("random patrol state");
-            return patrolState;
-        } 
-        Debug.Log("random idle state"); 
-        return idleState;   
+            agent = GetComponent<NavMeshAgent>();
+
+            stateMap = new Dictionary<CharacterStateID, ICharacterState>
+            {
+                { CharacterStateID.Patrol, new PatrolState() },
+                { CharacterStateID.Idle, new IdleState() },
+                { CharacterStateID.Interact, new InteractState() }
+            };
+
+            SwitchState(CharacterStateID.Patrol);
+        }
+
+        void Update()
+        {
+            _currentState?.OnUpdate();
+            currentState = GetCurrentStateID(); // For debugging/inspector display
+        }
+
+        public void SwitchState(CharacterStateID newState)
+        {
+            _currentState?.OnExit();
+            _currentState = stateMap[newState];
+            _currentState.OnEnter(this);
+        }
+
+        private CharacterStateID GetCurrentStateID()
+        {
+            foreach (var kvp in stateMap)
+            {
+                if (kvp.Value == _currentState)
+                    return kvp.Key;
+            }
+            return default;
+        }
+
+        public CharacterStateID GetRandomState()
+        {
+            return (Random.Range(0, 2) == 0) ? CharacterStateID.Patrol : CharacterStateID.Idle;
+        }
+
+        public Waypoint GetRandomWayPoint()
+        {
+            if (waypoints.Count == 0) return null;
+            currentWaypoint = waypoints[Random.Range(0, waypoints.Count)];
+            return currentWaypoint;
+        }
+
+        public NavMeshAgent GetNavMeshAgent() => agent;
     }
-    
-    public NavMeshAgent GetNavMeshAgent() => agent;
 }

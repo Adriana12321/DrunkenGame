@@ -1,35 +1,35 @@
 ﻿using UnityEngine;
-using UnityEngine.ProBuilder.Shapes;
 
 namespace NPC.States
 {
-    public class IdleState: ICharacterState
+    public class IdleState : ICharacterState
     {
         private NpcBehaviour context;
         private float idleTime;
-        
+
         public void OnEnter(NpcBehaviour npcBehaviour)
         {
             context = npcBehaviour;
             idleTime = Random.Range(3f, 10f);
+
+            context.currentWaypoint.AddOccupant(context);
+            Vector3 idleSpot = context.currentWaypoint.GetFreeIdlePosition();
+            context.GetNavMeshAgent().SetDestination(idleSpot);
         }
 
         public void OnUpdate()
         {
-            if (idleTime >= 0)
-            {
-                idleTime -= Time.deltaTime;
-            }
 
             if (idleTime <= 0)
             {
-                context.SwitchState(context.GetRandomSate());
+                context.SwitchState(context.GetRandomState());
             }
+            else idleTime -= Time.deltaTime;
         }
 
         public void OnExit()
         {
-            
+            context.currentWaypoint.RemoveOccupant(context);
         }
     }
 }

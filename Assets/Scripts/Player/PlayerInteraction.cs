@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cinemachine;
-using Unity.VisualScripting;
+using NPC;
 using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour
 {
-
+    [Header("UI")]
     public GameObject textUI;
 
     [Header("Detection Settings")]
@@ -17,20 +16,17 @@ public class PlayerInteraction : MonoBehaviour
     [Header("Interaction Settings")]
     public KeyCode interactKey = KeyCode.E;
 
-    private Collider[] npcColliders;
-    private Transform closestNPC;
-    
-    public List<Transform> npcsInRange;
+    public List<NpcBehaviour> npcsInRange = new();
 
     public bool isInteracting = false;
-    
+
+    [Header("Camera Settings")]
     public CinemachineTargetGroup targetGroup;
-    
-    private void Start()
+
+    void Start()
     {
         textUI.SetActive(false);
     }
-
 
     void Update()
     {
@@ -44,102 +40,90 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-
-
     void InteractionUpdate()
     {
         PlayerController.Instance.canMove = false;
 
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-            isInteracting = false;
-
-            targetGroup.m_Targets = Array.Empty<CinemachineTargetGroup.Target>();
-            
-            PlayerController.Instance.canMove = true;
-            PlayerController.Instance.fpsCamera.enabled = true;
-            PlayerController.Instance.thirdPersonCamera.enabled = false;
+            EndInteractionMode();
         }
     }
 
     void BrowsingUpdate()
     {
         PlayerController.Instance.canMove = true;
-        
+
         DetectNearbyNPCs();
+        
+        textUI.SetActive(npcsInRange.Count > 0);
+      
         HandleInteractionInput();
     }
 
     void DetectNearbyNPCs()
     {
-        npcColliders = Physics.OverlapSphere(transform.position, detectionRadius, npcLayer);
-        
-        npcsInRange = npcColliders.Select(n => n.GetComponent<Transform>()).Where(n => n != null).ToList();
-    }
+        npcsInRange.Clear();
 
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius, npcLayer);
 
-    void GetClosestNPC()
-    {
-        float closestDistance = Mathf.Infinity;
-        Transform nearest = null;
-
-        for (int i = 0; i < npcsInRange.Count; i++)
+        foreach (var hit in hits)
         {
-            float dist = Vector3.Distance(transform.position, npcsInRange[i].position);
-            if (dist < closestDistance)
+            NpcBehaviour npc = hit.GetComponent<NpcBehaviour>();
+            if (npc != null && !npcsInRange.Contains(npc))
             {
-                closestDistance = dist;
-                nearest = npcsInRange[i];
+                npcsInRange.Add(npc);
             }
         }
-
-        closestNPC = nearest;
     }
 
     void HandleInteractionInput()
     {
-        if (npcsInRange.Count>0)
-        {
-            textUI.SetActive(true);
-            if(Input.GetKeyDown(interactKey))
-            {
-                isInteracting = true;
-                
-                CameraSetUp();
-                
-                for (int i = 0; i < npcColliders.Length; i++)
-                {
-                    Debug.Log(npcColliders[i].name);
-                }
-            }
-        }
-        else
+        if (npcsInRange.Count == 0) return;
+
+        if (Input.GetKeyDown(interactKey))
         {
             textUI.SetActive(false);
+
+            isInteracting = true;
+
+            foreach (var npc in npcsInRange)
+            {
+                npc.SwitchState(CharacterStateID.Interact);
+            }
+
+            SetupCameras();
         }
     }
 
-
-    void CameraSetUp()
+    void SetupCameras()
     {
+        targetGroup.m_Targets = Array.Empty<CinemachineTargetGroup.Target>();
 
-        foreach (Transform t in npcsInRange)
+        foreach (var npc in npcsInRange)
         {
-            targetGroup.AddMember(t,1,1);
-            
+            targetGroup.AddMember(npc.transform, 1, 1);
         }
 
-        targetGroup.AddMember(PlayerController.Instance.transform,1,1);
-        
+        targetGroup.AddMember(PlayerController.Instance.transform, 1, 1);
+
         PlayerController.Instance.fpsCamera.enabled = false;
         PlayerController.Instance.thirdPersonCamera.enabled = true;
     }
+
+    void EndInteractionMode()
+    {
+        isInteracting = false;
+        targetGroup.m_Targets = Array.Empty<CinemachineTargetGroup.Target>();
+
+        PlayerController.Instance.canMove = true;
+        PlayerController.Instance.fpsCamera.enabled = true;
+        PlayerController.Instance.thirdPersonCamera.enabled = false;
+    }
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
-    
-    
-    
 }
