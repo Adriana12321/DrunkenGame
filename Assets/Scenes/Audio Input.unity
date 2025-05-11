@@ -122,6 +122,63 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &154637764
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1166530542074306, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_Name
+      value: MicControllerC
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4398593408365722, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b7ec442eb17941144aa725fa5ed57ec7, type: 3}
 --- !u!1 &421676867
 GameObject:
   m_ObjectHideFlags: 0
@@ -669,12 +726,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18f822ba595bed449b39f34dde7e6e45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  microphoneDevice: 
-  sampleRate: 44100
-  sampleWindow: 1024
-  knockThreshold: 0.2
-  zcrThreshold: 0.15
-  micIndex: 1
+  micControl: {fileID: 1209047315}
+  knockThreshold: 0.7
+  blowThreshold: 0.2
+  blowDurationThreshold: 1
 --- !u!4 &1121132497
 Transform:
   m_ObjectHideFlags: 0
@@ -690,6 +745,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1209047315 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114031281740315696, guid: b7ec442eb17941144aa725fa5ed57ec7,
+    type: 3}
+  m_PrefabInstance: {fileID: 154637764}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39c29357b6cdd384ba050226d8ea8227, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1669387767
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,3 +975,4 @@ SceneRoots:
   - {fileID: 1669387769}
   - {fileID: 421676873}
   - {fileID: 1121132497}
+  - {fileID: 154637764}
