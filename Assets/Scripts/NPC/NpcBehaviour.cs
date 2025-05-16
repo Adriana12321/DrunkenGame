@@ -33,27 +33,26 @@ namespace NPC
 
         private Vector3 previousPosition;
 
-        [Header("Interact Settings")]
-        public GameObject positiveObj;
-        public GameObject negativeObj;
-        public loudnessDetection detector;
-        public float volumeThreshold = 0.2f;
-        public AudioSource npcAudio;
+        [Header("Reaction (Interact) Component")]
+        [SerializeField] private Reactions reaction;
 
         void Start()
         {
             agent = GetComponent<NavMeshAgent>();
             previousPosition = transform.position;
-
-            // Optional: disable agent's rotation to better align animation with movement
             agent.updateRotation = false;
 
             stateMap = new Dictionary<CharacterStateID, ICharacterState>
             {
                 { CharacterStateID.Patrol, new PatrolState() },
                 { CharacterStateID.Idle, new IdleState() },
-                { CharacterStateID.Interact, CreateInteractState() }
+                { CharacterStateID.Interact, new InteractState() }
             };
+
+            if (stateMap[CharacterStateID.Interact] is InteractState interactState)
+            {
+                interactState.Initialize(reaction);
+            }
 
             SwitchState(CharacterStateID.Patrol);
         }
@@ -63,13 +62,6 @@ namespace NPC
             _currentState?.OnUpdate();
             currentState = GetCurrentStateID();
             UpdateAnimator();
-        }
-
-        private InteractState CreateInteractState()
-        {
-            var state = new InteractState();
-            state.Initialize(detector, positiveObj, negativeObj, volumeThreshold, npcAudio);
-            return state;
         }
 
         public void SwitchState(CharacterStateID newState)
@@ -105,9 +97,7 @@ namespace NPC
         {
             if (agent.velocity.sqrMagnitude > 0.01f)
             {
-                // Transform world velocity to local velocity relative to the character
                 Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
-
                 animator.SetFloat(MoveX, localVelocity.x);
                 animator.SetFloat(MoveY, localVelocity.z);
             }
@@ -117,7 +107,6 @@ namespace NPC
                 animator.SetFloat(MoveY, 0f);
             }
 
-            // Optional: rotate character to face movement direction
             if (agent.velocity.sqrMagnitude > 0.1f)
             {
                 transform.rotation = Quaternion.Slerp(
@@ -127,7 +116,6 @@ namespace NPC
                 );
             }
         }
-
 
         public NavMeshAgent GetNavMeshAgent() => agent;
     }

@@ -119,6 +119,12 @@ public class PlayerInteraction : MonoBehaviour
         PlayerController.Instance.canMove = true;
         PlayerController.Instance.fpsCamera.enabled = true;
         PlayerController.Instance.thirdPersonCamera.enabled = false;
+        
+        
+        foreach (var npc in npcsInRange)
+        {
+            npc.SwitchState(CharacterStateID.Idle);
+        }
     }
 
     void OnDrawGizmosSelected()
