@@ -14,6 +14,9 @@ namespace NPC
 
     public class NpcBehaviour : MonoBehaviour
     {
+        private static readonly int MoveY = Animator.StringToHash("MoveY");
+        private static readonly int MoveX = Animator.StringToHash("MoveX");
+
         [Header("Waypoints & Idle Settings")]
         public List<Waypoint> waypoints;
         public Waypoint currentWaypoint;
@@ -26,10 +29,17 @@ namespace NPC
         public CharacterStateID currentState;
 
         private NavMeshAgent agent;
+        public Animator animator;
+
+        private Vector3 previousPosition;
 
         void Start()
         {
             agent = GetComponent<NavMeshAgent>();
+            previousPosition = transform.position;
+
+            // Optional: disable agent's rotation to better align animation with movement
+            agent.updateRotation = false;
 
             stateMap = new Dictionary<CharacterStateID, ICharacterState>
             {
@@ -44,7 +54,8 @@ namespace NPC
         void Update()
         {
             _currentState?.OnUpdate();
-            currentState = GetCurrentStateID(); // For debugging/inspector display
+            currentState = GetCurrentStateID();
+            UpdateAnimator();
         }
 
         public void SwitchState(CharacterStateID newState)
@@ -75,6 +86,34 @@ namespace NPC
             currentWaypoint = waypoints[Random.Range(0, waypoints.Count)];
             return currentWaypoint;
         }
+
+        private void UpdateAnimator()
+        {
+            if (agent.velocity.sqrMagnitude > 0.01f)
+            {
+                // Transform world velocity to local velocity relative to the character
+                Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
+
+                animator.SetFloat(MoveX, localVelocity.x);
+                animator.SetFloat(MoveY, localVelocity.z);
+            }
+            else
+            {
+                animator.SetFloat(MoveX, 0f);
+                animator.SetFloat(MoveY, 0f);
+            }
+
+            // Optional: rotate character to face movement direction
+            if (agent.velocity.sqrMagnitude > 0.1f)
+            {
+                transform.rotation = Quaternion.Slerp(
+                    transform.rotation,
+                    Quaternion.LookRotation(agent.velocity.normalized),
+                    Time.deltaTime * 10f
+                );
+            }
+        }
+
 
         public NavMeshAgent GetNavMeshAgent() => agent;
     }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.ProBuilder.Shapes;
 
 namespace NPC.States
 {
@@ -10,7 +11,8 @@ namespace NPC.States
         public void OnEnter(NpcBehaviour npcBehaviour)
         {
             context = npcBehaviour;
-            idleTime = Random.Range(3f, 10f);
+            
+            idleTime = context.currentWaypoint.GetIdleTime();
 
             context.currentWaypoint.AddOccupant(context);
             Vector3 idleSpot = context.currentWaypoint.GetFreeIdlePosition();

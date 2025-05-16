@@ -60,5 +60,10 @@ namespace NPC
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, idleRadius);
         }
+
+        public float GetIdleTime()
+        {
+            return Random.Range(8f, 25f);
+        }
     }
 }

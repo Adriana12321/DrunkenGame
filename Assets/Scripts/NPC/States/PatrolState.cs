@@ -14,8 +14,9 @@ namespace NPC.States
             context = npcBehaviour;
             agent = context.GetNavMeshAgent();
             agent.isStopped = false;
-
+            
             FindValidWaypoint();
+            
         }
 
         public void OnUpdate()
