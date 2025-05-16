@@ -33,6 +33,13 @@ namespace NPC
 
         private Vector3 previousPosition;
 
+        [Header("Interact Settings")]
+        public GameObject positiveObj;
+        public GameObject negativeObj;
+        public loudnessDetection detector;
+        public float volumeThreshold = 0.2f;
+        public AudioSource npcAudio;
+
         void Start()
         {
             agent = GetComponent<NavMeshAgent>();
@@ -45,7 +52,7 @@ namespace NPC
             {
                 { CharacterStateID.Patrol, new PatrolState() },
                 { CharacterStateID.Idle, new IdleState() },
-                { CharacterStateID.Interact, new InteractState() }
+                { CharacterStateID.Interact, CreateInteractState() }
             };
 
             SwitchState(CharacterStateID.Patrol);
@@ -56,6 +63,13 @@ namespace NPC
             _currentState?.OnUpdate();
             currentState = GetCurrentStateID();
             UpdateAnimator();
+        }
+
+        private InteractState CreateInteractState()
+        {
+            var state = new InteractState();
+            state.Initialize(detector, positiveObj, negativeObj, volumeThreshold, npcAudio);
+            return state;
         }
 
         public void SwitchState(CharacterStateID newState)
