@@ -26,40 +26,36 @@ namespace NPC.States
         
         public void OnEnter(NpcBehaviour context)
         {
-            SoundFxManager.instance.PlayDialogSoundFx(context.transform, 1f);
             lowVolumeDuration = 1.5f;
-            if (npcAudio != null && !npcAudio.isPlaying)
-            {
-                npcAudio.Play();
-            }
         }
 
         public void OnUpdate()
         {
            float loudness = detector.getLoudnessFromMic();
 
-    if (loudness > volumeThreshold)
-    {
-        lowVolumeDuration = 0f;
-        positiveObj.SetActive(true);
-        negativeObj.SetActive(false);
-    }
-    else
-    {
-        lowVolumeDuration += Time.deltaTime;
+            if (loudness > volumeThreshold)
+            {
+                lowVolumeDuration = 0f;
+                positiveObj.SetActive(true);
+                negativeObj.SetActive(false);
+            }
+            else
+            {
+                lowVolumeDuration += Time.deltaTime;
 
-        if (lowVolumeDuration >= delayBeforeSwitch)
-        {
-            positiveObj.SetActive(false);
-            negativeObj.SetActive(true);
-        }
-    }
+                if (lowVolumeDuration >= delayBeforeSwitch)
+                {
+                    positiveObj.SetActive(false);
+                    negativeObj.SetActive(true);
+                }
+            }
         }
 
         public void OnExit()
         {   
             positiveObj.SetActive(false);
             negativeObj.SetActive(false);  
+            Debug.Log("wjdeduwdfwedfwuefjw");
         }
     }
 }
