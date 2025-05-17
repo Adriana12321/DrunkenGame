@@ -59,7 +59,7 @@ public class LoudnessVisualizer : MonoBehaviour
         if (envLoudnessText) envLoudnessText.text = $"Env: {smoothedEnvLoudness:F3}";
     }
 
-    private float GetAverageEnvironmentLoudness()
+    public float GetAverageEnvironmentLoudness()
     {
         float total = 0f;
         int activeSources = 0;
