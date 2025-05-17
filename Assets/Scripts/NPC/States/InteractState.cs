@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Sound;
+using UnityEngine;
 
 namespace NPC.States
 {
@@ -13,6 +14,7 @@ namespace NPC.States
 
         public void OnEnter(NpcBehaviour context)
         {
+            SoundFxManager.instance.PlayDialogSoundFx(context.transform, 1f);
             reaction?.StartReaction();
         }
 
