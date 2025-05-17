@@ -56,6 +56,8 @@ namespace NPC
                 obj.transform.localPosition = offset;
                 obj.SetActive(false);
             }
+
+            Debug.Log($"[{npcBehaviour.name}] Interaction started. Listening for reactions...");
         }
 
         public void OnExit()
@@ -64,6 +66,8 @@ namespace NPC
             {
                 if (obj != null) GameObject.Destroy(obj);
             }
+
+            Debug.Log($"[{npcBehaviour.name}] Interaction ended.");
         }
 
         public void OnUpdate()
@@ -81,24 +85,29 @@ namespace NPC
             smoothedLoudness = Mathf.Lerp(smoothedLoudness, micLoudness, smoothingFactor);
 
             GameObject newReaction = null;
+            string reason = "";
 
             if (smoothedLoudness > overloadThreshold)
             {
                 newReaction = angryObj;
+                reason = "Too loud (overload threshold)";
             }
             else if (smoothedLoudness > volumeThreshold)
             {
                 if (npcIsTalking)
                 {
                     newReaction = angryObj;
+                    reason = "Talking over NPC";
                 }
                 else if (smoothedLoudness > envLoudness)
                 {
                     newReaction = positiveObj;
+                    reason = "Louder than environment";
                 }
                 else
                 {
                     newReaction = angryObj;
+                    reason = "Too quiet vs environment";
                 }
 
                 lowVolumeDuration = 0f;
@@ -110,16 +119,19 @@ namespace NPC
                 if (npcIsTalking)
                 {
                     newReaction = positiveObj;
+                    reason = "Respectful silence during NPC speech";
                 }
                 else if (lowVolumeDuration >= delayBeforeConfused)
                 {
                     newReaction = confusedObj;
+                    reason = "Prolonged silence";
                 }
             }
 
             if (newReaction == null)
             {
                 newReaction = confusedObj;
+                reason = "Default fallback to confused";
             }
 
             bool canReact = reactionTimer <= 0f;
@@ -130,21 +142,19 @@ namespace NPC
                 lastActiveReaction = newReaction;
                 reactionTimer = (newReaction == positiveObj) ? positiveCooldown : angryCooldown;
 
-                // Adjust NPC score based on reaction
-                if (newReaction == positiveObj)
-                {
-                    npcBehaviour.AdjustScore(+5);
-                }
-                else if (newReaction == angryObj)
-                {
-                    npcBehaviour.AdjustScore(-3);
-                }
-                else if (newReaction == confusedObj)
-                {
-                    npcBehaviour.AdjustScore(-1);
-                }
+                int scoreChange = 0;
 
-                Debug.Log($"[{npcBehaviour.name}] Score: {npcBehaviour.GetScore()}/{npcBehaviour.GetMaxScore()}");
+                if (newReaction == positiveObj)
+                    scoreChange = +5;
+                else if (newReaction == angryObj)
+                    scoreChange = -3;
+                else if (newReaction == confusedObj)
+                    scoreChange = -1;
+
+                npcBehaviour.AdjustScore(scoreChange);
+                NpcReputationUI.UpdateScore(npcBehaviour.GetScore(), npcBehaviour.GetMaxScore());
+
+                Debug.Log($"[{npcBehaviour.name}] Reaction: {newReaction.name} ({reason}) | Mic: {micLoudness:F3}, Env: {envLoudness:F3}, Score: {npcBehaviour.GetScore()}/{npcBehaviour.GetMaxScore()}");
             }
 
             FacePlayer();

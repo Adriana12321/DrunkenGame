@@ -11,12 +11,24 @@ public class NpcReputationUI : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        gameObject.SetActive(false);
+
+        // Ensure Awake is called by enabling the GameObject at load time
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+            gameObject.SetActive(false); // deactivate immediately to stay hidden
+        }
     }
 
     public static void Show(int current, int max)
     {
-        if (instance == null) return;
+        if (instance == null)
+        {
+            Debug.LogWarning("NpcReputationUI instance is null!");
+            return;
+        }
+
+        Debug.Log($"NpcReputationUI.Show() called. Score: {current}/{max}");
 
         instance.reputationSlider.maxValue = max;
         instance.reputationSlider.value = current;
@@ -27,7 +39,6 @@ public class NpcReputationUI : MonoBehaviour
     public static void Hide()
     {
         if (instance == null) return;
-
         instance.gameObject.SetActive(false);
     }
 

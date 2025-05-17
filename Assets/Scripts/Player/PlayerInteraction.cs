@@ -17,12 +17,11 @@ public class PlayerInteraction : MonoBehaviour
     public KeyCode interactKey = KeyCode.E;
 
     public List<NpcBehaviour> npcsInRange = new();
-
     public bool isInteracting = false;
 
     [Header("Camera Settings")]
     public CinemachineTargetGroup targetGroup;
-    
+
     [Header("Reaction (Interact) Component")]
     [SerializeField] private Reactions reaction;
 
@@ -58,9 +57,7 @@ public class PlayerInteraction : MonoBehaviour
         PlayerController.Instance.canMove = true;
 
         DetectNearbyNPCs();
-        
         textUI.SetActive(npcsInRange.Count > 0);
-      
         HandleInteractionInput();
     }
 
@@ -87,13 +84,15 @@ public class PlayerInteraction : MonoBehaviour
         if (Input.GetKeyDown(interactKey))
         {
             textUI.SetActive(false);
-
             isInteracting = true;
 
             foreach (var npc in npcsInRange)
             {
                 npc.SetInteractionAction(reaction);
                 npc.SwitchState(CharacterStateID.Interact);
+
+                // ✅ Reputation bar trigger
+                NpcReputationUI.Show(npc.GetScore(), npc.GetMaxScore());
             }
 
             SetupCameras();
@@ -123,12 +122,14 @@ public class PlayerInteraction : MonoBehaviour
         PlayerController.Instance.canMove = true;
         PlayerController.Instance.fpsCamera.enabled = true;
         PlayerController.Instance.thirdPersonCamera.enabled = false;
-        
-        
+
         foreach (var npc in npcsInRange)
         {
             npc.SwitchState(CharacterStateID.Idle);
         }
+
+        // ✅ Hide the bar
+        NpcReputationUI.Hide();
     }
 
     void OnDrawGizmosSelected()
