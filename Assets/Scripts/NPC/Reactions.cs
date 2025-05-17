@@ -13,14 +13,16 @@ namespace NPC
         [Header("Settings")]
         public loudnessDetection micDetector;
         public LoudnessVisualizer loudnessVisualizer;
-        public float volumeThreshold = 0.2f;
-        public float overloadThreshold = 0.8f;
-        public float delayBeforeSwitch = 1.5f; // Time of inactivity before switching to confused
-        public float reactionCooldown = 1.0f;  // Minimum time between reaction switches
+        public float volumeThreshold = 0.005f;
+        public float overloadThreshold = 0.35f;
+        public float delayBeforeConfused = 1.5f;
+
+        public float positiveCooldown = 0.4f;
+        public float angryCooldown = 1.0f;
 
         private float lowVolumeDuration = 0f;
         private float smoothedLoudness = 0f;
-        private float smoothingFactor = 0.1f;
+        private float smoothingFactor = 0.25f;
 
         private float reactionTimer = 0f;
         private GameObject lastActiveReaction = null;
@@ -35,7 +37,7 @@ namespace NPC
         public void OnEnter(NpcBehaviour context)
         {
             npcBehaviour = context;
-            lowVolumeDuration = delayBeforeSwitch;
+            lowVolumeDuration = 0f;
             reactionTimer = 0f;
 
             SoundFxManager.instance.PlayDialogSoundFx(context.transform, 1f);
@@ -82,21 +84,21 @@ namespace NPC
 
             if (smoothedLoudness > overloadThreshold)
             {
-                newReaction = angryObj; // too loud
+                newReaction = angryObj;
             }
             else if (smoothedLoudness > volumeThreshold)
             {
                 if (npcIsTalking)
                 {
-                    newReaction = angryObj; // talking over NPC
+                    newReaction = angryObj;
                 }
                 else if (smoothedLoudness > envLoudness)
                 {
-                    newReaction = positiveObj; // good volume
+                    newReaction = positiveObj;
                 }
                 else
                 {
-                    newReaction = angryObj; // environment louder than player, NPC not talking
+                    newReaction = angryObj;
                 }
 
                 lowVolumeDuration = 0f;
@@ -107,19 +109,42 @@ namespace NPC
 
                 if (npcIsTalking)
                 {
-                    newReaction = positiveObj; // silent while NPC talks
+                    newReaction = positiveObj;
                 }
-                else if (lowVolumeDuration >= delayBeforeSwitch)
+                else if (lowVolumeDuration >= delayBeforeConfused)
                 {
-                    newReaction = confusedObj; // idle silence
+                    newReaction = confusedObj;
                 }
             }
 
-            if (newReaction != lastActiveReaction && reactionTimer <= 0f)
+            if (newReaction == null)
+            {
+                newReaction = confusedObj;
+            }
+
+            bool canReact = reactionTimer <= 0f;
+
+            if (newReaction != lastActiveReaction && canReact)
             {
                 ShowOnly(newReaction);
                 lastActiveReaction = newReaction;
-                reactionTimer = reactionCooldown;
+                reactionTimer = (newReaction == positiveObj) ? positiveCooldown : angryCooldown;
+
+                // Adjust NPC score based on reaction
+                if (newReaction == positiveObj)
+                {
+                    npcBehaviour.AdjustScore(+5);
+                }
+                else if (newReaction == angryObj)
+                {
+                    npcBehaviour.AdjustScore(-3);
+                }
+                else if (newReaction == confusedObj)
+                {
+                    npcBehaviour.AdjustScore(-1);
+                }
+
+                Debug.Log($"[{npcBehaviour.name}] Score: {npcBehaviour.GetScore()}/{npcBehaviour.GetMaxScore()}");
             }
 
             FacePlayer();

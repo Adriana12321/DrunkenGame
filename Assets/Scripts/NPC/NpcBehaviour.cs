@@ -33,6 +33,10 @@ namespace NPC
 
         private Vector3 previousPosition;
 
+        [Header("Reputation")]
+        [SerializeField] private int maxScore = 100;
+        [SerializeField] private int reactionScore = 50;
+
         void Start()
         {
             agent = GetComponent<NavMeshAgent>();
@@ -118,5 +122,14 @@ namespace NPC
                 interactState.SetAction(action);
             }
         }
+
+        public void AdjustScore(int delta)
+        {
+            reactionScore = Mathf.Clamp(reactionScore + delta, 0, maxScore);
+        }
+
+        public int GetScore() => reactionScore;
+        public int GetMaxScore() => maxScore;
+        public float GetScorePercent() => (float)reactionScore / maxScore;
     }
 }
