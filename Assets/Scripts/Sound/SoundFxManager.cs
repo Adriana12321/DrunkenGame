@@ -10,6 +10,7 @@ namespace Sound
         [SerializeField] private AudioSource soundFxPrefab;
         [SerializeField] private AudioSource npcSoundFxPrefab;
         [SerializeField] private AudioClip[] dialogFxClips;
+
         private void Awake()
         {
             if (instance == null)
@@ -21,29 +22,30 @@ namespace Sound
         public void PlaySoundFx(AudioClip clip, Transform spawnTransform, float volume)
         {
             AudioSource audioSource = Instantiate(soundFxPrefab, spawnTransform.position, Quaternion.identity);
-        
             audioSource.clip = clip;
-        
             audioSource.volume = volume;
-        
             audioSource.Play();
-        
-            float clipLenght = clip.length;
-        
-            Destroy(audioSource.gameObject, clipLenght);
+
+            var visualizer = FindObjectOfType<LoudnessVisualizer>();
+            visualizer?.RegisterSource(audioSource);
+
+            Destroy(audioSource.gameObject, clip.length);
         }
 
         public void PlayDialogSoundFx(Transform npcTransform, float volume)
         {
             float pitch = Random.Range(0.85f, 1.2f);
-    
+
             AudioSource audioSource = Instantiate(npcSoundFxPrefab, npcTransform.position, Quaternion.identity, npcTransform);
             audioSource.volume = volume;
             audioSource.pitch = pitch;
-            
+
+            var visualizer = FindObjectOfType<LoudnessVisualizer>();
+            visualizer?.RegisterSource(audioSource);
+
             StartCoroutine(PlayGibberishSequence(audioSource));
         }
-        
+
         private IEnumerator PlayGibberishSequence(AudioSource source)
         {
             if (dialogFxClips.Length == 0) yield break;
@@ -75,7 +77,5 @@ namespace Sound
 
             Destroy(source.gameObject);
         }
-
-
     }
 }
