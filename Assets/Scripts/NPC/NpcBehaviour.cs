@@ -33,9 +33,6 @@ namespace NPC
 
         private Vector3 previousPosition;
 
-        [Header("Reaction (Interact) Component")]
-        [SerializeField] private Reactions reaction;
-
         void Start()
         {
             agent = GetComponent<NavMeshAgent>();
@@ -48,11 +45,6 @@ namespace NPC
                 { CharacterStateID.Idle, new IdleState() },
                 { CharacterStateID.Interact, new InteractState() }
             };
-
-            if (stateMap[CharacterStateID.Interact] is InteractState interactState)
-            {
-                interactState.Initialize(reaction);
-            }
 
             SwitchState(CharacterStateID.Patrol);
         }
@@ -118,5 +110,13 @@ namespace NPC
         }
 
         public NavMeshAgent GetNavMeshAgent() => agent;
+
+        public void SetInteractionAction(ICharacterState action)
+        {
+            if (stateMap[CharacterStateID.Interact] is InteractState interactState)
+            {
+                interactState.SetAction(action);
+            }
+        }
     }
 }

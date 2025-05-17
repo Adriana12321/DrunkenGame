@@ -22,6 +22,9 @@ public class PlayerInteraction : MonoBehaviour
 
     [Header("Camera Settings")]
     public CinemachineTargetGroup targetGroup;
+    
+    [Header("Reaction (Interact) Component")]
+    [SerializeField] private Reactions reaction;
 
     void Start()
     {
@@ -89,6 +92,7 @@ public class PlayerInteraction : MonoBehaviour
 
             foreach (var npc in npcsInRange)
             {
+                npc.SetInteractionAction(reaction);
                 npc.SwitchState(CharacterStateID.Interact);
             }
 

@@ -14,7 +14,7 @@ namespace Sound
 
         public void SetFxVolume(float volume)
         {
-            mixer.SetFloat("xxVolume", volume);
+            mixer.SetFloat("fxVolume", volume);
         }
 
         public void SetMusicVolume(float volume)

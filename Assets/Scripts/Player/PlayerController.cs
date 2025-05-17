@@ -97,4 +97,9 @@ public class PlayerController : MonoBehaviour
         thirdPersonCamera.gameObject.SetActive(!thirdPersonCamera.gameObject.activeSelf);
         fpsCamera.gameObject.SetActive(!fpsCamera.gameObject.activeSelf);
     }
+
+    public Vector3 GetPlayerMeshPosition()
+    {
+        return characterController.transform.Find("Mesh").transform.position;
+    }
 }

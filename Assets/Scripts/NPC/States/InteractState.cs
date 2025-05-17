@@ -5,27 +5,26 @@ namespace NPC.States
 {
     public class InteractState : ICharacterState
     {
-        private Reactions reaction;
-
-        public void Initialize(Reactions reaction)
-        {
-            this.reaction = reaction;
-        }
-
+        private ICharacterState _action;
+        
         public void OnEnter(NpcBehaviour context)
         {
-            SoundFxManager.instance.PlayDialogSoundFx(context.transform, 1f);
-            reaction?.StartReaction();
+            _action?.OnEnter(context);
         }
 
         public void OnUpdate()
         {
-            reaction?.OnUpdate();
+            _action?.OnUpdate();
         }
 
         public void OnExit()
         {
-            reaction?.StopReaction();
+            _action?.OnExit();
+        }
+
+        public void SetAction(ICharacterState action)
+        {
+            _action = action;
         }
     }
 }

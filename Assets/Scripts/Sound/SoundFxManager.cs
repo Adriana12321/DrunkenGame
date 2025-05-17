@@ -46,20 +46,36 @@ namespace Sound
         
         private IEnumerator PlayGibberishSequence(AudioSource source)
         {
-            int clipCount = Random.Range(3, 7);
+            if (dialogFxClips.Length == 0) yield break;
 
-            for (int i = 0; i < clipCount; i++)
+            int totalClips = Random.Range(6, 10);
+            int clipsPlayed = 0;
+
+            while (clipsPlayed < totalClips)
             {
-                if (dialogFxClips.Length == 0) yield break;
+                int burstCount = Random.Range(2, 5);
+                burstCount = Mathf.Min(burstCount, totalClips - clipsPlayed);
 
-                AudioClip gibberishClip = dialogFxClips[Random.Range(0, dialogFxClips.Length)];
-                source.clip = gibberishClip;
-                source.Play();
+                for (int i = 0; i < burstCount; i++)
+                {
+                    AudioClip gibberishClip = dialogFxClips[Random.Range(0, dialogFxClips.Length)];
+                    source.clip = gibberishClip;
+                    source.Play();
+                    yield return new WaitForSeconds(gibberishClip.length);
 
-                yield return new WaitForSeconds(gibberishClip.length + Random.Range(0.01f, 0.2f));
+                    clipsPlayed++;
+                }
+
+                if (clipsPlayed < totalClips)
+                {
+                    float burstDelay = Random.Range(0.3f, 0.6f);
+                    yield return new WaitForSeconds(burstDelay);
+                }
             }
+
             Destroy(source.gameObject);
         }
+
 
     }
 }
