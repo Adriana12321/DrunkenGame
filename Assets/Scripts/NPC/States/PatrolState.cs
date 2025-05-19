@@ -23,7 +23,7 @@ namespace NPC.States
         {
             if (agent.remainingDistance <= agent.stoppingDistance)
             {
-                context.SwitchState(context.GetRandomState());
+                context.SwitchState(context.currentWaypoint.GetActivityState());
             }
         }
 

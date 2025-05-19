@@ -68,10 +68,15 @@ namespace NPC
             }
 
             Debug.Log($"[{npcBehaviour.name}] Interaction ended.");
+            
+            
+            
         }
 
         public void OnUpdate()
         {
+            
+            npcBehaviour.FaceObjectUpdate(PlayerController.Instance.GetPlayerMeshPosition());            
             if (npcSpeechTimer > 0f)
             {
                 npcSpeechTimer -= Time.deltaTime;
@@ -157,22 +162,8 @@ namespace NPC
                 Debug.Log($"[{npcBehaviour.name}] Reaction: {newReaction.name} ({reason}) | Mic: {micLoudness:F3}, Env: {envLoudness:F3}, Score: {npcBehaviour.GetScore()}/{npcBehaviour.GetMaxScore()}");
             }
 
-            FacePlayer();
+
         }
-
-        private void FacePlayer()
-        {
-            Vector3 targetPosition = PlayerController.Instance.GetPlayerMeshPosition();
-            Vector3 direction = targetPosition - npcBehaviour.transform.position;
-            direction.y = 0f;
-
-            if (direction.sqrMagnitude > 0.001f)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(direction);
-                npcBehaviour.transform.rotation = Quaternion.Slerp(npcBehaviour.transform.rotation, targetRotation, Time.deltaTime * 5f);
-            }
-        }
-
         private void ShowOnly(GameObject objToShow)
         {
             foreach (var obj in new[] { positiveObj, confusedObj, angryObj })

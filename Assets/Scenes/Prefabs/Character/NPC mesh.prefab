@@ -238,7 +238,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1123321627494520100}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.25
+  m_Radius: 0.1
   m_Speed: 2
   m_Acceleration: 8
   avoidancePriority: 50
@@ -250,7 +250,7 @@ NavMeshAgent:
   m_Height: 1.79
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 2
+  m_ObstacleAvoidanceType: 0
 --- !u!114 &5092088427506078258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -267,6 +267,9 @@ MonoBehaviour:
   currentWaypoint: {fileID: 0}
   currentState: 0
   animator: {fileID: 7885971554168126544}
+  maxScore: 100
+  reactionScore: 50
+  npcMesh: {fileID: 0}
 --- !u!136 &165011095485807124
 CapsuleCollider:
   m_ObjectHideFlags: 0

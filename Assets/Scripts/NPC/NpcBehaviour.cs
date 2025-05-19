@@ -9,7 +9,8 @@ namespace NPC
     {
         Patrol,
         Idle,
-        Interact
+        Interact,
+        Dance,
     }
 
     public class NpcBehaviour : MonoBehaviour
@@ -37,17 +38,25 @@ namespace NPC
         [SerializeField] private int maxScore = 100;
         [SerializeField] private int reactionScore = 50;
 
+        [SerializeField] private GameObject npcMesh; 
+
         void Start()
         {
             agent = GetComponent<NavMeshAgent>();
             previousPosition = transform.position;
             agent.updateRotation = false;
 
+            if (npcMesh == null)
+            {
+                npcMesh = transform.GetChild(0).gameObject;
+            }
+            
             stateMap = new Dictionary<CharacterStateID, ICharacterState>
             {
                 { CharacterStateID.Patrol, new PatrolState() },
                 { CharacterStateID.Idle, new IdleState() },
-                { CharacterStateID.Interact, new InteractState() }
+                { CharacterStateID.Interact, new InteractState() },
+                { CharacterStateID.Dance , new DanceState()}
             };
 
             SwitchState(CharacterStateID.Patrol);
@@ -131,5 +140,20 @@ namespace NPC
         public int GetScore() => reactionScore;
         public int GetMaxScore() => maxScore;
         public float GetScorePercent() => (float)reactionScore / maxScore;
+
+        public void FaceObjectUpdate(Vector3 target)
+        {
+            Vector3 direction = target - transform.position;
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+            }
+        }
+
+        public GameObject GetNpcMesh() => npcMesh;
+
     }
 }

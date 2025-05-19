@@ -125,7 +125,7 @@ public class PlayerInteraction : MonoBehaviour
 
         foreach (var npc in npcsInRange)
         {
-            npc.SwitchState(CharacterStateID.Idle);
+            npc.SwitchState(CharacterStateID.Patrol);
         }
 
         // ✅ Hide the bar

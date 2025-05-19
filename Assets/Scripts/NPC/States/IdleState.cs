@@ -21,7 +21,6 @@ namespace NPC.States
 
         public void OnUpdate()
         {
-
             if (idleTime <= 0)
             {
                 context.SwitchState(context.GetRandomState());

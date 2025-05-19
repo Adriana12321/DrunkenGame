@@ -4204,6 +4204,16 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 4148547785774603383, guid: 1434c0246628a9b42879c3bd4fd7dd8f,
+        type: 3}
+      propertyPath: m_ObstacleAvoidanceType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5092088427506078258, guid: 1434c0246628a9b42879c3bd4fd7dd8f,
+        type: 3}
+      propertyPath: npcMesh
+      value: 
+      objectReference: {fileID: 5491121593757608744}
     - target: {fileID: 5092088427506078258, guid: 1434c0246628a9b42879c3bd4fd7dd8f,
         type: 3}
       propertyPath: animator

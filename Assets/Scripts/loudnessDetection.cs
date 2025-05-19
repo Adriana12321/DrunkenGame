@@ -21,7 +21,7 @@ public class loudnessDetection : MonoBehaviour
     {
         if (Microphone.devices.Length > 0)
         {
-            string mic = Microphone.devices[0];
+            string mic = Microphone.devices[1];
             micClip = Microphone.Start(mic, true, 20, AudioSettings.outputSampleRate);
         }
         else

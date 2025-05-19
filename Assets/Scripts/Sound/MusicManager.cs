@@ -42,6 +42,7 @@ namespace Sound
                 nextClip = musicClips[Random.Range(0, musicClips.Count)];
             } while (currentClips.ContainsKey(source) && nextClip == currentClips[source] && musicClips.Count > 1);
 
+            
             source.clip = nextClip;
             source.Play();
 
