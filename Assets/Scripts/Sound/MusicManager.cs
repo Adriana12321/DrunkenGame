@@ -8,45 +8,47 @@ namespace Sound
         [Header("Playlist")]
         [SerializeField] private List<AudioClip> musicClips;
 
-        private List<AudioSource> djSources = new List<AudioSource>();
-        private Dictionary<AudioSource, AudioClip> currentClips = new Dictionary<AudioSource, AudioClip>();
+        [Header("Volume Dynamics")]
+        [SerializeField] private float minVolume = 0.3f;
+        [SerializeField] private float maxVolume = 1.0f;
+        [SerializeField] private float volumeChangeInterval = 10f;
+        [SerializeField, Range(0f, 1f)] private float muteChance = 0.1f;
 
-        private void Start()
+        private List<AudioSource> djSources = new();
+        private float volumeTimer;
+        private AudioClip currentClip;
+
+        void Start()
         {
             djSources.AddRange(GetComponentsInChildren<AudioSource>());
-
-            foreach (AudioSource source in djSources)
-            {
-                PlayRandomClip(source);
-            }
+            PlayNewTrack();
         }
 
-        private void Update()
+        void Update()
         {
-            foreach (AudioSource source in djSources)
+            if (!djSources[0].isPlaying)
+                PlayNewTrack();
+
+            volumeTimer -= Time.deltaTime;
+            if (volumeTimer <= 0f)
             {
-                if (!source.isPlaying)
-                {
-                    PlayRandomClip(source);
-                }
+                foreach (var source in djSources)
+                    source.volume = Random.value < muteChance ? 0f : Random.Range(minVolume, maxVolume);
+
+                volumeTimer = volumeChangeInterval;
             }
         }
 
-        private void PlayRandomClip(AudioSource source)
+        void PlayNewTrack()
         {
             if (musicClips.Count == 0) return;
 
-            AudioClip nextClip;
-            do
+            currentClip = musicClips[Random.Range(0, musicClips.Count)];
+            foreach (var source in djSources)
             {
-                nextClip = musicClips[Random.Range(0, musicClips.Count)];
-            } while (currentClips.ContainsKey(source) && nextClip == currentClips[source] && musicClips.Count > 1);
-
-            
-            source.clip = nextClip;
-            source.Play();
-
-            currentClips[source] = nextClip;
+                source.clip = currentClip;
+                source.Play();
+            }
         }
     }
 }

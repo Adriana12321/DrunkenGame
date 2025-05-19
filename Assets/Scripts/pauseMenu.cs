@@ -1,27 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class menuBtn : MonoBehaviour
 {
-
     public GameObject pauseMenu;
     public static bool isPaused;
-    [SerializeField] private MonoBehaviour lookScript;
-    // Start is called before the first frame update
+
+    public TMP_Dropdown micDropdown;
+    public loudnessDetection micManager;
+
+    
     void Start()
     {
         pauseMenu.SetActive(false);
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        
+        var devices = micManager.GetAvailableMicDevices();
+        micDropdown.ClearOptions();
+        micDropdown.AddOptions(devices);
+        micDropdown.onValueChanged.AddListener(index =>
+        {
+            micManager.SetMicDevice(devices[index]);
+        });
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.P)){
-            if(isPaused){
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            if (isPaused)
+            {
                 ResumeGame();
-            } else {
+            }
+            else
+            {
                 PauseGame();
             }
         }
@@ -33,8 +50,11 @@ public class menuBtn : MonoBehaviour
         Time.timeScale = 0f;
         isPaused = true;
 
-        if (lookScript != null)
-            lookScript.enabled = false;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.enabled = false;
     }
 
     public void ResumeGame()
@@ -43,7 +63,10 @@ public class menuBtn : MonoBehaviour
         Time.timeScale = 1f;
         isPaused = false;
 
-        if (lookScript != null)
-            lookScript.enabled = true;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.enabled = true;
     }
 }

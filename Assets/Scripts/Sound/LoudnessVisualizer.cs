@@ -57,6 +57,7 @@ public class LoudnessVisualizer : MonoBehaviour
         float envDisplay = Mathf.Clamp01(smoothedEnvLoudness * 5f);
         envLoudnessSlider.value = envDisplay;
         if (envLoudnessText) envLoudnessText.text = $"Env: {smoothedEnvLoudness:F3}";
+        
     }
 
     public float GetAverageEnvironmentLoudness()

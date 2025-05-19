@@ -154,6 +154,30 @@ namespace NPC
         }
 
         public GameObject GetNpcMesh() => npcMesh;
+        
+        public bool ApplyOverrideAnimation(string resourcePath)
+        {
+            if (animator == null || animator.runtimeAnimatorController == null)
+            {
+                Debug.LogWarning($"[{name}] NpcBehaviour: Animator or controller missing.");
+                return false;
+            }
+
+            var clip = Resources.Load<AnimationClip>(resourcePath);
+            if (clip == null)
+            {
+                Debug.LogWarning($"[{name}] NpcBehaviour: Could not find animation at '{resourcePath}'");
+                return false;
+            }
+
+            var overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+            overrideController["empty_action"] = clip;
+            animator.runtimeAnimatorController = overrideController;
+
+            return true;
+        }
+
+        
 
     }
 }

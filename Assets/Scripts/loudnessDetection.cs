@@ -1,10 +1,14 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class loudnessDetection : MonoBehaviour
 {
     private AudioClip micClip;
     public int sampleWindow = 64;
+    
+    private string currentMicDevice;
 
     [Header("Debug GUI Settings")]
     public bool showDebugGUI = true;
@@ -17,12 +21,18 @@ public class loudnessDetection : MonoBehaviour
         MicToAudioClip();
     }
 
+    private void Update()
+    {
+        Debug.Log("mic: " + currentMicDevice);
+
+    }
+
     public void MicToAudioClip()
     {
         if (Microphone.devices.Length > 0)
         {
-            string mic = Microphone.devices[1];
-            micClip = Microphone.Start(mic, true, 20, AudioSettings.outputSampleRate);
+            currentMicDevice = Microphone.devices[0]; // default to first
+            micClip = Microphone.Start(currentMicDevice, true, 20, AudioSettings.outputSampleRate);
         }
         else
         {
@@ -30,12 +40,13 @@ public class loudnessDetection : MonoBehaviour
         }
     }
 
+
     public float getLoudnessFromMic()
     {
         if (Microphone.devices.Length == 0 || micClip == null)
             return 0;
 
-        int micPosition = Microphone.GetPosition(Microphone.devices[0]);
+        int micPosition = Microphone.GetPosition(currentMicDevice);
         return getLoudnessFromAudioclip(micPosition, micClip);
     }
 
@@ -70,4 +81,26 @@ public class loudnessDetection : MonoBehaviour
             $"Loudness: {loudness:0.000}"
         );
     }
+    
+    public List<string> GetAvailableMicDevices()
+    {
+        return new List<string>(Microphone.devices);
+    }
+    public void SetMicDevice(string deviceName)
+    {
+        if (Microphone.devices.Length == 0 || !System.Array.Exists(Microphone.devices, d => d == deviceName))
+        {
+            Debug.LogWarning($"Microphone device '{deviceName}' not found.");
+            return;
+        }
+
+        if (Microphone.IsRecording(currentMicDevice))
+        {
+            Microphone.End(currentMicDevice);
+        }
+
+        currentMicDevice = deviceName;
+        micClip = Microphone.Start(currentMicDevice, true, 20, AudioSettings.outputSampleRate);
+    }
+
 }
